@@ -1,0 +1,58 @@
+{% extends "base.html" %} 
+{% block title %}
+{{username}}'s Posts
+{% endblock%} 
+
+{% block content %}
+
+<h1 align="center">{% block header %} 
+    {{username}}'s posts 
+    {% endblock %} </h1>
+
+    
+    
+    <div id="posts" class="d-flex flex-wrap justify-content-center">
+      {% for post in posts %}
+    
+      <div class= " border-dark d-flex flex-wrap" style="flex: 1 0 50%;; max-width: 50%;background-image: url(../static/images/download.jpeg);background-size: cover; 
+      background-repeat: no-repeat; 
+      background-attachment: fixed;  ">
+        <div class="card-container" style="margin: 10px; border: 1px solid indigo; border-radius: 12px; width: 100%; ">
+          
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('views.open_post', id=post.id) }}">{{ post.title }}</a><br/>
+          </div>
+    
+          <div class="card-body">
+            <div class="card-text">{{ post.text }}</div>
+            <p class="card-text">
+              {% if post.comments|length > 0 %}
+                <small style="color: blueviolet;"> {{post.comments|length}} Comments</small>
+              </a>
+              {% else %}
+              <small class="text-muted">No Comments</small>
+              {% endif %}
+            </p>
+    
+          </div>
+    
+          <div class="card-footer  " style="display:flex;justify-content:  space-between; align-items: center; ">
+            <div class="text-muted" >       {{ post.date_created.strftime("%d-%m-%Y %H:%M:%S")}}</div>
+    
+             <div >{{ post.user.username }}</div>
+            
+        </div>
+            </div>
+      </div>
+    
+      <br />
+      {% endfor %}
+    </div>
+    
+    <div align="center">
+        <a href="/home"><button type="button" class="btn btn-primary btn-lg">Back</button></a>
+    </div>
+    
+    {% endblock %}
+
+    

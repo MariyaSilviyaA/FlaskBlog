@@ -1,0 +1,161 @@
+{% extends "all_posts.html" %}
+{% block title %}
+{{username}}'s Posts
+{% endblock%}
+
+
+{% block header %}
+{{username}}'s posts
+{% endblock %}
+{% block content %}
+<h1 align="center" style="padding-top: 50px;"> Post</h1>
+<div id="posts" class="d-flex flex-wrap justify-content-center">
+
+  <div class=" border-dark d-flex flex-wrap" style="flex: 1 0 50%;; max-width: 50%;background-image: url(../static/images/download.jpeg);background-size: cover; 
+          background-repeat: no-repeat; 
+          background-attachment: fixed;  ">
+    <div class="card-container" style="margin: 10px;  border:1px solid indigo;  border-radius: 12px; width: 100%;">
+
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-text">{{post.title}}</div>
+
+
+        {% if user.id == post.author %}
+        <div class="btn-group">
+
+          </ul>
+          <a href="/update-post/{{post.id}}"><button class="btn btn-outline-primary"
+              style="border-radius: 12px; margin-right: 6px;">Update</button></a>
+
+          <br />
+          <a href="/delete-post/{{post.id}}"><button class="btn btn-outline-danger"
+              style="border-radius: 12px; ">Delete</button></a>
+
+        </div>
+        {% endif %}
+      </div>
+      <div class="card-body">
+        <div class="card-text">{{post.text}}</div>
+        <br />
+        <!-- <div class="collapse" id="comments-{{post.id}}" >
+                <div class="card">
+                  <div class="card-body" id="comments-expanded-{{post.id}}"style="  background-color:#F3E8ECff;">
+                    {% for comment in post.comments %}
+                    <div class="d-flex justify-content-between align-items-center"style="background-color: #F3E8ECff; 
+                    ">
+                      <span  >
+                        <a href="/posts/{{comment.user.username}}">{{comment.user.username}}</a>: {{comment.text}}
+                      </span><br/>
+                      <div>
+                        <small class="text-muted"> {{comment.date_created.strftime("%d-%m-%Y %H:%M:%S")}}</small>
+                        {% if user.id == comment.author or user.id == post.author %}
+                        <div class="btn-group">
+                              <a href="/delete-comment/{{comment.id}}" ><i class="fa-solid fa-trash" ></i></a>
+                        </div>
+                        {% endif %}
+                      </div>
+                    </div><hr>
+                    {% endfor %}
+                    
+                  </div>
+                
+                </div>
+              </div> -->
+
+        <!-- <p>Show Collapse: {{ show_collapse }}</p> -->
+
+
+        <div class="collapse {{ 'show' if show_collapse else '' }}" id="comments-{{post.id}}">
+          <div class="card">
+            <div class="card-body collapse show" id="comments-expanded-{{post.id}}" style="background-color:#F3E8ECff;">
+              {% for comment in post.comments %}
+              <div class="d-flex justify-content-between align-items-center " style="background-color: #F3E8ECff;">
+                <span>
+                  <a href="/posts/{{comment.user.username}}">{{comment.user.username}}</a>: {{comment.text}}
+                </span><br />
+                <div>
+                  <small class="text-muted"> {{comment.date_created.strftime("%d-%m-%Y %H:%M:%S")}}</small>
+                  {% if user.id == comment.author or user.id == post.author %}
+                  <div class="btn-group">
+                    <a href="/delete-comment/{{comment.id}}"><i class="fa-solid fa-trash"></i></a>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+              <hr>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <p class="card-text">
+          {% if post.comments|length > 0 %}
+          <a data-bs-toggle="collapse" href="#comments-{{post.id}}" role="button" aria-expanded="false"
+            aria-controls="comments-{{post.id}}" id="toggle-comments-{{post.id}}">
+            <small>View {{post.comments|length}} Comments</small>
+          </a>
+          {% else %}
+          <small class="text-muted">No Comments</small>
+          {% endif %}
+        </p>
+        <form class="input-group mb-3" method="POST" action="/create-comment/{{post.id}}">
+          <input type="text" id="text" name="text" class="form-control" placeholder="Comment here!" />
+          <button type="submit" class="btn btn-secondary" style="background-color:slategray">Comment</button>
+        </form>
+      </div>
+      <div class="card-footer  " style="display:flex;justify-content:  space-between; align-items: center; ">
+        <div class="text-muted"> {{ post.date_created.strftime("%d-%m-%Y %H:%M:%S")}}</div>
+
+        <div><a href="/posts/{{ post.user.username }}">{{ post.user.username }}</a></div>
+
+      </div>
+    </div>
+  </div>
+  <br />
+</div>
+<div align="center">
+  <a href="{{url_for('views.home')}}"><button type="button" class="btn btn-primary btn-lg">Back</button></a>
+</div>
+
+<!-- <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var postId = '{{ post.id }}';
+        var commentsSection = document.getElementById('comments-' + postId);
+        var toggleLink = document.getElementById('toggle-comments-' + postId);
+    
+        commentsSection.addEventListener('shown.bs.collapse', function () {
+          toggleLink.innerHTML = `<small>Hide Comments</small>`;
+        });
+    
+        commentsSection.addEventListener('hidden.bs.collapse', function () {
+          toggleLink.innerHTML = `<small>View ${commentsSection.querySelectorAll('.d-flex').length} Comments</small>`;
+        });
+      });
+    </script> -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var postId = '{{ post.id }}'
+    var commentsSection = document.getElementById('comments-' + postId);
+    var toggleLink = document.getElementById('toggle-comments-' + postId);
+
+    commentsSection.addEventListener('shown.bs.collapse', function () {
+      toggleLink.innerHTML = `<small>Hide Comments</small>`;
+    });
+
+    commentsSection.addEventListener('hidden.bs.collapse', function () {
+      toggleLink.innerHTML = `<small>View ${commentsSection.querySelectorAll('.d-flex').length} Comments</small>`;
+    });
+
+    // Check if the comments section is open
+    if (commentsSection.classList.contains('show')) {
+      toggleLink.innerHTML = `<small>Hide Comments</small>`;
+    }
+  });
+</script>
+
+
+
+
+
+{% endblock%}
